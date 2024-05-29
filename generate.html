@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hong Kong Car Plate Generator</title>
+    <style>
+        body {
+            font-family: 'Arial Rounded MT Bold', sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .car-plate {
+            width: 100%;
+            max-width: 522px;
+            height: auto;
+            aspect-ratio: 4.28 / 1;
+            padding: 10px 20px;
+            font-size: 4.5em;
+            font-weight: bold;
+            background-color: #f4de4f;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #plate-list {
+            margin-top: 20px;
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        #plate-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        #plate-list li button {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #plate-input {
+            font-size: 18px;
+            padding: 10px 15px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            width: 250px;
+            margin-right: 10px;
+            transition: border-color 0.3s ease;
+        }
+
+        #plate-input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+
+        button {
+            font-size: 16px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <h1>Hong Kong Car Plate Generator</h1>
+    <input type="text" id="plate-input" placeholder="Enter Hong Kong car plate number">
+    <button onclick="generateCarPlate()">Generate Plate</button>
+    <div id="plate-display" class="car-plate"></div>
+    <ul id="plate-list"></ul>
+    <script>
+        // Wait for the DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Call the generateCarPlate function when the page loads
+            generateCarPlate();
+            // Populate the plate list with previously generated plates
+            updatePlateList(getPlatesFromLocalStorage());
+        });
+        // Get the plate list element
+        const plateList = document.getElementById('plate-list');
+        const input = document.getElementById('plate-input');
+
+        // Retrieve previously generated plates from localStorage
+        function getPlatesFromLocalStorage() {
+            const plates = localStorage.getItem('plates');
+            if (plates) {
+                return JSON.parse(plates).reverse();
+            } else {
+                return [];
+            }
+        }
+
+        // Save the generated plate to localStorage
+        function savePlateToCookies(plate) {
+            const existingPlates = getPlatesFromLocalStorage();
+            existingPlates.push(plate);
+            localStorage.setItem('plates', JSON.stringify(existingPlates));
+            updatePlateList(existingPlates);
+        }
+
+        // Delete a plate from localStorage and the plate list
+        function deletePlate(index) {
+            const plates = getPlatesFromLocalStorage();
+            plates.splice(index, 1);
+            localStorage.setItem('plates', JSON.stringify(plates));
+            updatePlateList(plates);
+        }
+
+        // Update the plate list in the DOM
+        function updatePlateList(plates) {
+            plateList.innerHTML = '';
+            plates.forEach((plate, index) => {
+                const li = document.createElement('li');
+                const plateSpan = document.createElement('span');
+                plateSpan.textContent = plate;
+                plateSpan.addEventListener('click', () => handlePlateClick(plate));
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.addEventListener('click', () => deletePlate(index));
+                li.appendChild(plateSpan);
+                li.appendChild(deleteButton);
+                plateList.appendChild(li);
+            });
+        }
+
+        function handlePlateClick(plate) {
+            document.getElementById('plate-display').textContent = plate; plate
+        }
+
+        function generateCarPlate() {
+            // Generate a random 4-digit plate number and a random letter
+            const plateLetters = 'ABCDEFGHJKLMNOPQRSTUVWXYZ';
+            if (!input.value) {
+                const plateNumber = `${plateLetters[Math.floor(Math.random() * plateLetters.length)]}${plateLetters[Math.floor(Math.random() * plateLetters.length)]} ${Math.floor(1000 + Math.random() * 9000)}`;
+                document.getElementById('plate-display').textContent = plateNumber;
+
+                // Save the generated plate to localStorage
+                savePlateToCookies(plateNumber);
+            } else {
+                savePlateToCookies(input.value);
+                document.getElementById('plate-display').textContent = input.value;
+                input.value = '';
+            }
+        }
+
+
+
+    </script>
+</body>
+
+</html>
