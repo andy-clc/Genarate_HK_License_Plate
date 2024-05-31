@@ -13,6 +13,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            background: darkgray;
         }
 
         .car-plate {
@@ -120,7 +121,7 @@
         // Wait for the DOM to be fully loaded
         document.addEventListener('DOMContentLoaded', () => {
             // Call the generateCarPlate function when the page loads
-            generateCarPlate();
+            getPreviousCarPlate();
             // Populate the plate list with previously generated plates
             updatePlateList(getPlatesFromLocalStorage());
         });
@@ -172,7 +173,17 @@
         }
 
         function handlePlateClick(plate) {
-            document.getElementById('plate-display').textContent = plate; plate
+            document.getElementById('plate-display').textContent = plate;
+            localStorage.setItem('selected_plate', plate);
+        }
+
+        function getPreviousCarPlate() {
+            if (localStorage.getItem('selected_plate')) {
+                document.getElementById('plate-display').textContent = localStorage.getItem('selected_plate');
+            } else {
+                generateCarPlate()
+            }
+
         }
 
         function generateCarPlate() {
@@ -181,12 +192,13 @@
             if (!input.value) {
                 const plateNumber = `${plateLetters[Math.floor(Math.random() * plateLetters.length)]}${plateLetters[Math.floor(Math.random() * plateLetters.length)]} ${Math.floor(1000 + Math.random() * 9000)}`;
                 document.getElementById('plate-display').textContent = plateNumber;
-
+                localStorage.setItem('selected_plate', plateNumber);
                 // Save the generated plate to localStorage
                 savePlateToCookies(plateNumber);
             } else {
-                savePlateToCookies(input.value);
-                document.getElementById('plate-display').textContent = input.value;
+                savePlateToCookies(input.value.toUpperCase());
+                localStorage.setItem('selected_plate', input.value.toUpperCase());
+                document.getElementById('plate-display').textContent = input.value.toUpperCase();
                 input.value = '';
             }
         }
